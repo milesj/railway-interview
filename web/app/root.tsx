@@ -59,22 +59,15 @@ export default function App() {
 
       <AppShell.Navbar p="md">
         <NavLink
-          href="#required-for-focus"
-          label="Containers"
+          href="/"
+          label="Active services"
+          leftSection={<IconListTree size="1rem" />}
+        />
+        <NavLink
+          href="/new"
+          label="Spin up service"
           leftSection={<IconBoxModel2 size="1rem" />}
-          childrenOffset={28}
-        >
-          <NavLink
-            href="/containers"
-            label="View running containers"
-            leftSection={<IconListTree size="1rem" />}
-          />
-          <NavLink
-            href="/containers/new"
-            label="Spin up container"
-            leftSection={<IconBoxModel2 size="1rem" />}
-          />
-        </NavLink>
+        />
       </AppShell.Navbar>
 
       <AppShell.Main>
