@@ -14,5 +14,10 @@
   },
   "vcs": {
     "useIgnoreFile": true
+  },
+  "json": {
+    "formatter": {
+      "indentStyle": "space"
+    }
   }
 }

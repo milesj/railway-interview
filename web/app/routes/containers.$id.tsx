@@ -14,11 +14,11 @@ const READ_PROJECT = graphql(`
 `);
 
 export function ReadProject() {
-  const { data } = useQuery({
-    queryKey: ["project"],
-    queryFn: async () =>
-      request("https://backboard.railway.app/graphql/v2", READ_PROJECT),
-  });
+	const { data } = useQuery({
+		queryKey: ["project"],
+		queryFn: async () =>
+			request("https://backboard.railway.app/graphql/v2", READ_PROJECT),
+	});
 
-  return null;
+	return null;
 }
