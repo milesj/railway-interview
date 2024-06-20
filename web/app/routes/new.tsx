@@ -12,6 +12,14 @@ import {
 } from "@mantine/core";
 import { IconWhirl } from "@tabler/icons-react";
 import { type FieldState, useForm } from "@tanstack/react-form";
+import { valibotValidator } from "@tanstack/valibot-form-adapter";
+import * as v from "valibot";
+
+const ENVIRONMENTS = [
+	{ value: "production", label: "Production" },
+	{ value: "development", label: "Development" },
+	{ value: "staging", label: "Staging" },
+];
 
 export default function New() {
 	const form = useForm({
@@ -25,6 +33,7 @@ export default function New() {
 			// Docker
 			docker_image: "",
 		},
+		validatorAdapter: valibotValidator(),
 		async onSubmit(data) {
 			console.log(data);
 		},
@@ -58,18 +67,19 @@ export default function New() {
 					</div>
 
 					<div>
-						<form.Field name="environment">
+						<form.Field
+							name="environment"
+							validators={{
+								onChange: v.picklist(ENVIRONMENTS.map((env) => env.value)),
+							}}
+						>
 							{(field) => (
 								<Select
 									required
 									name={field.name}
 									label="Environment"
 									placeholder="Environment to create the service in."
-									data={[
-										{ value: "production", label: "Production" },
-										{ value: "development", label: "Development" },
-										{ value: "staging", label: "Staging" },
-									]}
+									data={ENVIRONMENTS}
 									onBlur={field.handleBlur}
 									onChange={(value) => value && field.handleChange(value)}
 									{...getFieldProps(field.state)}
@@ -121,7 +131,15 @@ export default function New() {
 							selected && (
 								<>
 									<div>
-										<form.Field name="repo_url">
+										<form.Field
+											name="repo_url"
+											validators={{
+												onChange: v.union([
+													v.pipe(v.string(), v.url()),
+													v.pipe(v.string(), v.startsWith("git@")),
+												]),
+											}}
+										>
 											{(field) => (
 												<TextInput
 													required
@@ -137,7 +155,12 @@ export default function New() {
 									</div>
 
 									<div>
-										<form.Field name="repo_branch">
+										<form.Field
+											name="repo_branch"
+											validators={{
+												onChange: v.pipe(v.string(), v.nonEmpty()),
+											}}
+										>
 											{(field) => (
 												<TextInput
 													required
@@ -160,7 +183,12 @@ export default function New() {
 						{(selected) =>
 							selected && (
 								<div>
-									<form.Field name="docker_image">
+									<form.Field
+										name="docker_image"
+										validators={{
+											onChange: v.pipe(v.string(), v.nonEmpty()),
+										}}
+									>
 										{(field) => (
 											<TextInput
 												required
