@@ -17,7 +17,16 @@ import {
 	Scripts,
 	ScrollRestoration,
 } from "@remix-run/react";
-import { IconListTree, IconTrain, IconWhirl } from "@tabler/icons-react";
+import {
+	IconCube,
+	IconCubePlus,
+	IconTable,
+	IconTablePlus,
+	IconTrain,
+} from "@tabler/icons-react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 export function Layout({ children }: { children: React.ReactNode }) {
 	return (
@@ -30,7 +39,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 				<ColorSchemeScript />
 			</head>
 			<body>
-				<MantineProvider defaultColorScheme="dark">{children}</MantineProvider>
+				<MantineProvider defaultColorScheme="dark">
+					<QueryClientProvider client={queryClient}>
+						{children}
+					</QueryClientProvider>
+				</MantineProvider>
 				<ScrollRestoration />
 				<Scripts />
 			</body>
@@ -60,16 +73,45 @@ export default function App() {
 			<AppShell.Navbar p="md">
 				<NavLink
 					component={Link}
-					to="/"
-					label="Active services"
-					leftSection={<IconListTree size="1rem" />}
-				/>
+					to="/projects"
+					label="Projects"
+					leftSection={<IconTable size="1rem" />}
+				>
+					<NavLink
+						component={Link}
+						to="/projects"
+						label="View all"
+						leftSection={<IconTable size="1rem" />}
+					/>
+
+					<NavLink
+						component={Link}
+						to="/projects/new"
+						label="Create new"
+						leftSection={<IconTablePlus size="1rem" />}
+					/>
+				</NavLink>
+
 				<NavLink
 					component={Link}
-					to="/new"
-					label="Spin up service"
-					leftSection={<IconWhirl size="1rem" />}
-				/>
+					to="/services"
+					label="Services"
+					leftSection={<IconCube size="1rem" />}
+				>
+					<NavLink
+						component={Link}
+						to="/services"
+						label="View active"
+						leftSection={<IconCube size="1rem" />}
+					/>
+
+					<NavLink
+						component={Link}
+						to="/services/new"
+						label="Spin up"
+						leftSection={<IconCubePlus size="1rem" />}
+					/>
+				</NavLink>
 			</AppShell.Navbar>
 
 			<AppShell.Main>

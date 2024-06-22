@@ -13,7 +13,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "\n  query readProject($id: String!) {\n    project(id: $id) {\n      createdAt\n      deletedAt\n      description\n      id\n    }\n  }\n": types.ReadProjectDocument,
+    "\nquery ListProjects {\n\tprojects {\n\t\tedges {\n\t\t\tcursor\n\t\t\tnode {\n\t\t\t\tcreatedAt\n\t\t\t\tdeletedAt\n\t\t\t\tdescription\n\t\t\t\tid\n\t\t\t\tisPublic\n\t\t\t\tisTempProject\n\t\t\t\tname\n\t\t\t\tsubscriptionPlanLimit\n\t\t\t\tsubscriptionType\n\t\t\t\tteam {\n\t\t\t\t\tid\n\t\t\t\t\tname\n\t\t\t\t}\n\t\t\t\tteamId\n\t\t\t}\n\t\t}\n\t\tpageInfo {\n\t\t\tendCursor\n\t\t\tstartCursor\n\t\t\thasNextPage\n\t\t\thasPreviousPage\n\t\t}\n\t}\n}": types.ListProjectsDocument,
 };
 
 /**
@@ -33,7 +33,7 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query readProject($id: String!) {\n    project(id: $id) {\n      createdAt\n      deletedAt\n      description\n      id\n    }\n  }\n"): (typeof documents)["\n  query readProject($id: String!) {\n    project(id: $id) {\n      createdAt\n      deletedAt\n      description\n      id\n    }\n  }\n"];
+export function graphql(source: "\nquery ListProjects {\n\tprojects {\n\t\tedges {\n\t\t\tcursor\n\t\t\tnode {\n\t\t\t\tcreatedAt\n\t\t\t\tdeletedAt\n\t\t\t\tdescription\n\t\t\t\tid\n\t\t\t\tisPublic\n\t\t\t\tisTempProject\n\t\t\t\tname\n\t\t\t\tsubscriptionPlanLimit\n\t\t\t\tsubscriptionType\n\t\t\t\tteam {\n\t\t\t\t\tid\n\t\t\t\t\tname\n\t\t\t\t}\n\t\t\t\tteamId\n\t\t\t}\n\t\t}\n\t\tpageInfo {\n\t\t\tendCursor\n\t\t\tstartCursor\n\t\t\thasNextPage\n\t\t\thasPreviousPage\n\t\t}\n\t}\n}"): (typeof documents)["\nquery ListProjects {\n\tprojects {\n\t\tedges {\n\t\t\tcursor\n\t\t\tnode {\n\t\t\t\tcreatedAt\n\t\t\t\tdeletedAt\n\t\t\t\tdescription\n\t\t\t\tid\n\t\t\t\tisPublic\n\t\t\t\tisTempProject\n\t\t\t\tname\n\t\t\t\tsubscriptionPlanLimit\n\t\t\t\tsubscriptionType\n\t\t\t\tteam {\n\t\t\t\t\tid\n\t\t\t\t\tname\n\t\t\t\t}\n\t\t\t\tteamId\n\t\t\t}\n\t\t}\n\t\tpageInfo {\n\t\t\tendCursor\n\t\t\tstartCursor\n\t\t\thasNextPage\n\t\t\thasPreviousPage\n\t\t}\n\t}\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

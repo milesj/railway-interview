@@ -1223,6 +1223,8 @@ export type Mutation = {
   userFlagsSet: Scalars['Boolean']['output'];
   /** Updates the profile for the authenticated user */
   userProfileUpdate: Scalars['Boolean']['output'];
+  /** Disconnect your Railway account from Slack. */
+  userSlackDisconnect: Scalars['Boolean']['output'];
   /** Update date of TermsAgreedOn */
   userTermsUpdate?: Maybe<User>;
   /** Update currently logged in user */
@@ -2755,6 +2757,8 @@ export type Query = {
   usage: Array<AggregatedUsage>;
   /** Get the user id corresponding to a Discord id */
   userIdForDiscordId: Scalars['String']['output'];
+  /** Get the user id corresponding to a Slack id */
+  userIdForSlackId: Scalars['String']['output'];
   /**
    * Get the total kickback earnings for a user.
    * @deprecated This field is deprecated and will be removed in future versions.
@@ -3209,6 +3213,11 @@ export type QueryUsageArgs = {
 
 export type QueryUserIdForDiscordIdArgs = {
   discordId: Scalars['String']['input'];
+};
+
+
+export type QueryUserIdForSlackIdArgs = {
+  slackId: Scalars['String']['input'];
 };
 
 
@@ -3803,6 +3812,8 @@ export type Subscription = {
   __typename?: 'Subscription';
   /** Stream logs for a build */
   buildLogs: Array<Log>;
+  /** Subscribe to updates for a specific deployment */
+  deployment: Deployment;
   /** Subscribe to deployment events for a specific deployment */
   deploymentEvents: DeploymentEvent;
   /** Stream logs for a deployment */
@@ -3816,6 +3827,11 @@ export type SubscriptionBuildLogsArgs = {
   deploymentId: Scalars['String']['input'];
   filter?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type SubscriptionDeploymentArgs = {
+  id: Scalars['String']['input'];
 };
 
 
@@ -4114,6 +4130,7 @@ export type TemplateKickbacksLeaderboard = {
 
 export type TemplatePublishInput = {
   category: Scalars['String']['input'];
+  demoProjectId?: InputMaybe<Scalars['String']['input']>;
   description: Scalars['String']['input'];
   image?: InputMaybe<Scalars['String']['input']>;
   readme: Scalars['String']['input'];
@@ -4614,12 +4631,10 @@ export type CustomerTogglePayoutsToCreditsInput = {
   isWithdrawingToCredits: Scalars['Boolean']['input'];
 };
 
-export type ReadProjectQueryVariables = Exact<{
-  id: Scalars['String']['input'];
-}>;
+export type ListProjectsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ReadProjectQuery = { __typename?: 'Query', project: { __typename?: 'Project', createdAt: any, deletedAt?: any | null, description?: string | null, id: string } };
+export type ListProjectsQuery = { __typename?: 'Query', projects: { __typename?: 'QueryProjectsConnection', edges: Array<{ __typename?: 'QueryProjectsConnectionEdge', cursor: string, node: { __typename?: 'Project', createdAt: any, deletedAt?: any | null, description?: string | null, id: string, isPublic: boolean, isTempProject: boolean, name: string, subscriptionPlanLimit: any, subscriptionType: SubscriptionPlanType, teamId?: string | null, team?: { __typename?: 'Team', id: string, name: string } | null } }>, pageInfo: { __typename?: 'PageInfo', endCursor?: string | null, startCursor?: string | null, hasNextPage: boolean, hasPreviousPage: boolean } } };
 
 
-export const ReadProjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"readProject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"project"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"deletedAt"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<ReadProjectQuery, ReadProjectQueryVariables>;
+export const ListProjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ListProjects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cursor"}},{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"deletedAt"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"isPublic"}},{"kind":"Field","name":{"kind":"Name","value":"isTempProject"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"subscriptionPlanLimit"}},{"kind":"Field","name":{"kind":"Name","value":"subscriptionType"}},{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"teamId"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"endCursor"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}}]}}]}}]}}]} as unknown as DocumentNode<ListProjectsQuery, ListProjectsQueryVariables>;

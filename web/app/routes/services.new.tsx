@@ -21,7 +21,7 @@ const ENVIRONMENTS = [
 	{ value: "staging", label: "Staging" },
 ];
 
-export default function New() {
+export default function ServiceCreate() {
 	const form = useForm({
 		defaultValues: {
 			name: "",
