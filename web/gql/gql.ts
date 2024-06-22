@@ -14,6 +14,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 const documents = {
     "\nquery ListProjects {\n\tprojects {\n\t\tedges {\n\t\t\tcursor\n\t\t\tnode {\n\t\t\t\tcreatedAt\n\t\t\t\tdeletedAt\n\t\t\t\tdescription\n\t\t\t\tid\n\t\t\t\tisPublic\n\t\t\t\tisTempProject\n\t\t\t\tname\n\t\t\t\tsubscriptionPlanLimit\n\t\t\t\tsubscriptionType\n\t\t\t\tteam {\n\t\t\t\t\tid\n\t\t\t\t\tname\n\t\t\t\t}\n\t\t\t\tteamId\n\t\t\t}\n\t\t}\n\t\tpageInfo {\n\t\t\tendCursor\n\t\t\tstartCursor\n\t\t\thasNextPage\n\t\t\thasPreviousPage\n\t\t}\n\t}\n}": types.ListProjectsDocument,
+    "\nmutation CreateProject($input: ProjectCreateInput!) {\n\tprojectCreate(input: $input) {\n\t\tid\n\t\tname\n\t}\n}": types.CreateProjectDocument,
 };
 
 /**
@@ -34,6 +35,10 @@ export function graphql(source: string): unknown;
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\nquery ListProjects {\n\tprojects {\n\t\tedges {\n\t\t\tcursor\n\t\t\tnode {\n\t\t\t\tcreatedAt\n\t\t\t\tdeletedAt\n\t\t\t\tdescription\n\t\t\t\tid\n\t\t\t\tisPublic\n\t\t\t\tisTempProject\n\t\t\t\tname\n\t\t\t\tsubscriptionPlanLimit\n\t\t\t\tsubscriptionType\n\t\t\t\tteam {\n\t\t\t\t\tid\n\t\t\t\t\tname\n\t\t\t\t}\n\t\t\t\tteamId\n\t\t\t}\n\t\t}\n\t\tpageInfo {\n\t\t\tendCursor\n\t\t\tstartCursor\n\t\t\thasNextPage\n\t\t\thasPreviousPage\n\t\t}\n\t}\n}"): (typeof documents)["\nquery ListProjects {\n\tprojects {\n\t\tedges {\n\t\t\tcursor\n\t\t\tnode {\n\t\t\t\tcreatedAt\n\t\t\t\tdeletedAt\n\t\t\t\tdescription\n\t\t\t\tid\n\t\t\t\tisPublic\n\t\t\t\tisTempProject\n\t\t\t\tname\n\t\t\t\tsubscriptionPlanLimit\n\t\t\t\tsubscriptionType\n\t\t\t\tteam {\n\t\t\t\t\tid\n\t\t\t\t\tname\n\t\t\t\t}\n\t\t\t\tteamId\n\t\t\t}\n\t\t}\n\t\tpageInfo {\n\t\t\tendCursor\n\t\t\tstartCursor\n\t\t\thasNextPage\n\t\t\thasPreviousPage\n\t\t}\n\t}\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\nmutation CreateProject($input: ProjectCreateInput!) {\n\tprojectCreate(input: $input) {\n\t\tid\n\t\tname\n\t}\n}"): (typeof documents)["\nmutation CreateProject($input: ProjectCreateInput!) {\n\tprojectCreate(input: $input) {\n\t\tid\n\t\tname\n\t}\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

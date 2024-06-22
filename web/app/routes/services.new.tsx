@@ -11,15 +11,12 @@ import {
 	Title,
 } from "@mantine/core";
 import { IconWhirl } from "@tabler/icons-react";
-import { type FieldState, useForm } from "@tanstack/react-form";
+import { useForm } from "@tanstack/react-form";
 import { valibotValidator } from "@tanstack/valibot-form-adapter";
+import type { FormEvent } from "react";
 import * as v from "valibot";
-
-const ENVIRONMENTS = [
-	{ value: "production", label: "Production" },
-	{ value: "development", label: "Development" },
-	{ value: "staging", label: "Staging" },
-];
+import { ENVIRONMENTS } from "~/utils/data";
+import { getValueFieldProps } from "~/utils/form";
 
 export default function ServiceCreate() {
 	const form = useForm({
@@ -39,17 +36,17 @@ export default function ServiceCreate() {
 		},
 	});
 
+	function handleSubmit(event: FormEvent) {
+		event.preventDefault();
+		event.stopPropagation();
+		form.handleSubmit();
+	}
+
 	return (
 		<Container>
 			<Title order={1}>Spin up service</Title>
 
-			<form
-				onSubmit={(e) => {
-					e.preventDefault();
-					e.stopPropagation();
-					form.handleSubmit();
-				}}
-			>
+			<form onSubmit={handleSubmit}>
 				<Stack py="md">
 					<div>
 						<form.Field name="name">
@@ -60,7 +57,7 @@ export default function ServiceCreate() {
 									description="Name of your service. If not provided, will be automatically generated."
 									onBlur={field.handleBlur}
 									onChange={(e) => field.handleChange(e.target.value)}
-									{...getFieldProps(field.state)}
+									{...getValueFieldProps(field.state)}
 								/>
 							)}
 						</form.Field>
@@ -78,11 +75,11 @@ export default function ServiceCreate() {
 									required
 									name={field.name}
 									label="Environment"
-									placeholder="Environment to create the service in."
+									description="Environment to create the service in."
 									data={ENVIRONMENTS}
 									onBlur={field.handleBlur}
 									onChange={(value) => value && field.handleChange(value)}
-									{...getFieldProps(field.state)}
+									{...getValueFieldProps(field.state)}
 								/>
 							)}
 						</form.Field>
@@ -118,7 +115,7 @@ export default function ServiceCreate() {
 												{ label: "Empty", value: "empty" },
 											]}
 											onChange={field.handleChange}
-											{...getFieldProps(field.state)}
+											{...getValueFieldProps(field.state)}
 										/>
 									)}
 								</form.Field>
@@ -148,7 +145,7 @@ export default function ServiceCreate() {
 													description="URL of your repository. Supports both https and git protocols."
 													onBlur={field.handleBlur}
 													onChange={(e) => field.handleChange(e.target.value)}
-													{...getFieldProps(field.state)}
+													{...getValueFieldProps(field.state)}
 												/>
 											)}
 										</form.Field>
@@ -169,7 +166,7 @@ export default function ServiceCreate() {
 													description="Name of branch to spinup."
 													onBlur={field.handleBlur}
 													onChange={(e) => field.handleChange(e.target.value)}
-													{...getFieldProps(field.state)}
+													{...getValueFieldProps(field.state)}
 												/>
 											)}
 										</form.Field>
@@ -197,7 +194,7 @@ export default function ServiceCreate() {
 												description="Name of a Docker image from DockerHub, GHCR, or quay.io."
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
-												{...getFieldProps(field.state)}
+												{...getValueFieldProps(field.state)}
 											/>
 										)}
 									</form.Field>
@@ -227,20 +224,4 @@ export default function ServiceCreate() {
 			</form>
 		</Container>
 	);
-}
-
-// environmentId: String
-
-// Environment ID. If the specified environment is a fork, the service will only be created in it. Otherwise it will created in all environments that are not forks of other environments
-// name: String
-// projectId: String!
-// registryCredentials: RegistryCredentialsInput
-// source: ServiceSourceInput
-// variables: ServiceVariables
-
-function getFieldProps<Data>(state: FieldState<Data>) {
-	return {
-		value: state.value,
-		error: state.meta.errors.length > 0 ? state.meta.errors[0] : undefined,
-	};
 }

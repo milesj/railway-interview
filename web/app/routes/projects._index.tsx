@@ -9,10 +9,13 @@ import {
 	Title,
 } from "@mantine/core";
 import { Link, json, useLoaderData } from "@remix-run/react";
+import { useQuery } from "@tanstack/react-query";
 import { graphql } from "gql";
 import { graphqlClient } from "~/clients/graphql";
 
-const LIST_PROJECTS = graphql(`
+function listProjects() {
+	return graphqlClient.request(
+		graphql(`
 query ListProjects {
 	projects {
 		edges {
@@ -41,16 +44,22 @@ query ListProjects {
 			hasPreviousPage
 		}
 	}
-}`);
+}`),
+	);
+}
 
 export async function loader() {
-	const data = await graphqlClient.request(LIST_PROJECTS);
-
-	return json(data);
+	return json(await listProjects());
 }
 
 export default function ProjectList() {
-	const data = useLoaderData<typeof loader>();
+	const initialData = useLoaderData<typeof loader>();
+
+	const { data } = useQuery({
+		queryKey: ["projects"],
+		queryFn: listProjects,
+		initialData,
+	});
 
 	return (
 		<Container>
