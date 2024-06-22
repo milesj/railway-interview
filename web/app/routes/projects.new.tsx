@@ -1,7 +1,9 @@
 import {
+	Alert,
 	Button,
 	Container,
 	Flex,
+	List,
 	Select,
 	Stack,
 	Switch,
@@ -10,12 +12,15 @@ import {
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@remix-run/react";
+import { IconInfoCircle } from "@tabler/icons-react";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { valibotValidator } from "@tanstack/valibot-form-adapter";
 import { graphql } from "gql";
 import type { ProjectCreateInput } from "gql/graphql";
-import type { FormEvent } from "react";
+import type { GraphQLError } from "graphql";
+import { ClientError } from "graphql-request";
+import { type FormEvent, useState } from "react";
 import * as v from "valibot";
 import { graphqlClient } from "~/clients/graphql";
 import { ENVIRONMENTS } from "~/utils/data";
@@ -38,12 +43,14 @@ export default function ProjectCreate() {
 	const queryClient = useQueryClient();
 	const navigate = useNavigate();
 
+	const [errors, setErrors] = useState<GraphQLError[]>();
 	const { mutate, isPending } = useMutation({
 		mutationFn: createProject,
 		onSuccess(data) {
 			notifications.show({
 				message: `Project ${data.projectCreate.name} has been created! Will redirect in 3 seconds.`,
 				color: "green",
+				autoClose: 3000,
 			});
 
 			// Clear projects list cache
@@ -54,7 +61,14 @@ export default function ProjectCreate() {
 				navigate("/projects");
 			}, 3000);
 		},
-		onError() {
+		onError(error) {
+			if (error instanceof ClientError) {
+				if (error.response.errors) {
+					setErrors(error.response.errors);
+					return;
+				}
+			}
+
 			notifications.show({
 				message: "Failed to create project, please try again later.",
 				color: "red",
@@ -71,6 +85,8 @@ export default function ProjectCreate() {
 		},
 		validatorAdapter: valibotValidator(),
 		async onSubmit({ value }) {
+			setErrors([]);
+
 			await mutate({
 				name: value.name,
 				description: value.description,
@@ -93,12 +109,18 @@ export default function ProjectCreate() {
 			<form onSubmit={handleSubmit}>
 				<Stack py="md">
 					<div>
-						<form.Field name="name">
+						<form.Field
+							name="name"
+							validators={{
+								onChange: v.pipe(v.string(), v.trim(), v.nonEmpty()),
+							}}
+						>
 							{(field) => (
 								<TextInput
+									required
 									name={field.name}
 									label="Name"
-									description="Name of your project. If not provided, will be automatically generated."
+									description="Name of your project."
 									onBlur={field.handleBlur}
 									onChange={(e) => field.handleChange(e.target.value)}
 									{...getValueFieldProps(field.state)}
@@ -158,6 +180,16 @@ export default function ProjectCreate() {
 						</form.Field>
 					</div>
 				</Stack>
+
+				{errors && errors.length > 0 && (
+					<Alert color="red" mt="md" icon={<IconInfoCircle />}>
+						<List>
+							{errors.map((error) => (
+								<List.Item key={error.message}>{error.message}</List.Item>
+							))}
+						</List>
+					</Alert>
+				)}
 
 				<Flex justify="center" mt="xl">
 					<form.Subscribe

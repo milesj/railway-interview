@@ -1,4 +1,5 @@
 import {
+	Anchor,
 	Badge,
 	Button,
 	Center,
@@ -100,13 +101,18 @@ export default function ProjectList() {
 							{data.projects.edges.map(({ cursor, node: project }) => (
 								<Table.Tr key={cursor}>
 									<Table.Td>
-										<b>{project.name}</b>
+										<Anchor
+											href={`https://railway.app/project/${project.id}`}
+											target="_blank"
+										>
+											{project.name}
+										</Anchor>
 										<br />
 										{project.description}
 									</Table.Td>
 									<Table.Td>
 										{project.isPublic ? (
-											<Badge>Public</Badge>
+											<Badge color="blue">Public</Badge>
 										) : (
 											<Badge color="pink">Private</Badge>
 										)}

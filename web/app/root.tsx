@@ -66,7 +66,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
 				<ColorSchemeScript />
 			</head>
 			<body>
-				<MantineProvider defaultColorScheme="dark">
+				<MantineProvider
+					defaultColorScheme="dark"
+					theme={{ primaryColor: "grape" }}
+				>
 					<QueryClientProvider client={queryClient}>
 						{children}
 						<Notifications />

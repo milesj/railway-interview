@@ -1,24 +1,16 @@
 import { GraphQLClient } from "graphql-request";
 
-declare global {
-	interface Window {
-		ENV: Record<string, string>;
-	}
-}
-
-const TOKEN =
+export const graphqlClient =
 	typeof process === "undefined"
-		? window.ENV.RAILWAY_TOKEN
-		: process.env.RAILWAY_TOKEN;
-
-export const graphqlClient = new GraphQLClient(
-	"https://backboard.railway.app/graphql/v2",
-	{
-		credentials: "include",
-		headers: {
-			Authorization: `Bearer ${TOKEN}`,
-			// CORS
-			"Access-Control-Allow-Origin": "*",
-		},
-	},
-);
+		? // Client
+			new GraphQLClient(`${location.origin}/graphql`, {
+				credentials: "include",
+			})
+		: // Server
+			new GraphQLClient("https://backboard.railway.app/graphql/v2", {
+				headers: {
+					Authorization: `Bearer ${process.env.RAILWAY_TOKEN}`,
+					// CORS
+					"Access-Control-Allow-Origin": "*",
+				},
+			});
