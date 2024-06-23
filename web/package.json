@@ -7,12 +7,13 @@
     "build": "remix vite:build",
     "dev": "concurrently 'pnpm run codegen --watch' 'remix vite:dev'",
     "start": "remix-serve ./build/server/index.js",
-    "typecheck": "tsc",
+    "typecheck": "tsc --noEmit",
     "codegen": "graphql-codegen --config gql.codegen.ts"
   },
   "dependencies": {
     "@mantine/core": "^7.10.2",
     "@mantine/hooks": "^7.10.2",
+    "@mantine/modals": "^7.10.2",
     "@mantine/notifications": "^7.10.2",
     "@remix-run/node": "^2.9.2",
     "@remix-run/react": "^2.9.2",

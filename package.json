@@ -4,7 +4,7 @@
     "dev": "cd web && pnpm run dev",
     "build": "cd web && pnpm run build",
     "start": "cd web && pnpm run start",
-    "check": "biome check --write .",
+    "check": "biome check --write . && pnpm --filter web run typecheck",
     "format": "biome format --write .",
     "lint": "biome lint --write ."
   },
@@ -14,5 +14,8 @@
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "typescript": "^5.1.6"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }

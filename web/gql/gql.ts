@@ -13,6 +13,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
+    "\nmutation DeleteProject($id: String!) {\n\t\tprojectDelete(id: $id)\n}": types.DeleteProjectDocument,
     "\nquery ListProjects {\n\tprojects {\n\t\tedges {\n\t\t\tcursor\n\t\t\tnode {\n\t\t\t\tcreatedAt\n\t\t\t\tdeletedAt\n\t\t\t\tdescription\n\t\t\t\tid\n\t\t\t\tisPublic\n\t\t\t\tisTempProject\n\t\t\t\tname\n\t\t\t\tsubscriptionPlanLimit\n\t\t\t\tsubscriptionType\n\t\t\t\tteam {\n\t\t\t\t\tid\n\t\t\t\t\tname\n\t\t\t\t}\n\t\t\t\tteamId\n\t\t\t}\n\t\t}\n\t\tpageInfo {\n\t\t\tendCursor\n\t\t\tstartCursor\n\t\t\thasNextPage\n\t\t\thasPreviousPage\n\t\t}\n\t}\n}": types.ListProjectsDocument,
     "\nmutation CreateProject($input: ProjectCreateInput!) {\n\tprojectCreate(input: $input) {\n\t\tid\n\t\tname\n\t}\n}": types.CreateProjectDocument,
     "\nquery ReadProject($id: String!) {\n\tproject(id: $id) {\n\t\tid\n\t\tname\n\t\tservices {\n\t\t\tedges {\n\t\t\t\tcursor\n\t\t\t\tnode {\n\t\t\t\t\tcreatedAt\n\t\t\t\t\ticon\n\t\t\t\t\tid\n\t\t\t\t\tname\n\t\t\t\t}\n\t\t\t}\n\t\t\tpageInfo {\n\t\t\t\tendCursor\n\t\t\t\tstartCursor\n\t\t\t\thasNextPage\n\t\t\t\thasPreviousPage\n\t\t\t}\n\t\t}\n\t}\n}": types.ReadProjectDocument,
@@ -32,6 +33,10 @@ const documents = {
  */
 export function graphql(source: string): unknown;
 
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\nmutation DeleteProject($id: String!) {\n\t\tprojectDelete(id: $id)\n}"): (typeof documents)["\nmutation DeleteProject($id: String!) {\n\t\tprojectDelete(id: $id)\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

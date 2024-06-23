@@ -10,6 +10,7 @@ import {
 	ThemeIcon,
 	Title,
 } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
 import {
 	Link,
@@ -70,10 +71,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 					defaultColorScheme="dark"
 					theme={{ primaryColor: "grape" }}
 				>
-					<QueryClientProvider client={queryClient}>
-						{children}
-						<Notifications />
-					</QueryClientProvider>
+					<ModalsProvider>
+						<QueryClientProvider client={queryClient}>
+							{children}
+							<Notifications />
+						</QueryClientProvider>
+					</ModalsProvider>
 				</MantineProvider>
 				<ScrollRestoration />
 				<script

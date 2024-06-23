@@ -13,6 +13,7 @@ import { Link, json, useLoaderData } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import { graphql } from "gql";
 import { graphqlClient } from "~/clients/graphql";
+import { ProjectRow } from "~/components/projects/ProjectRow";
 
 export function listProjects() {
 	return graphqlClient.request(
@@ -99,36 +100,7 @@ export default function ProjectList() {
 
 						<Table.Tbody>
 							{data.projects.edges.map(({ cursor, node: project }) => (
-								<Table.Tr key={cursor}>
-									<Table.Td>
-										<Anchor
-											href={`https://railway.app/project/${project.id}`}
-											target="_blank"
-										>
-											{project.name}
-										</Anchor>
-										<br />
-										{project.description}
-									</Table.Td>
-									<Table.Td>
-										{project.isPublic ? (
-											<Badge color="blue">Public</Badge>
-										) : (
-											<Badge color="pink">Private</Badge>
-										)}
-									</Table.Td>
-									<Table.Td>
-										{project.team ? project.team.name : "N/A"}
-									</Table.Td>
-									<Table.Td>
-										<Badge>{project.subscriptionType}</Badge>
-									</Table.Td>
-									<Table.Td>
-										{project.createdAt
-											? new Date(project.createdAt).toLocaleString()
-											: ""}
-									</Table.Td>
-								</Table.Tr>
+								<ProjectRow key={cursor} project={project} />
 							))}
 						</Table.Tbody>
 					</Table>
