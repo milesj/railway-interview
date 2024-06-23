@@ -14,7 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import { graphql } from "gql";
 import { graphqlClient } from "~/clients/graphql";
 
-function listProjects() {
+export function listProjects() {
 	return graphqlClient.request(
 		graphql(`
 query ListProjects {

@@ -2,6 +2,8 @@
   "private": true,
   "scripts": {
     "dev": "cd web && pnpm run dev",
+    "build": "cd web && pnpm run build",
+    "start": "cd web && pnpm run start",
     "check": "biome check --write .",
     "format": "biome format --write .",
     "lint": "biome lint --write ."
