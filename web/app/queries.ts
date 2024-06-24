@@ -36,6 +36,21 @@ query ReadProject($id: String!) {
 	project(id: $id) {
 		id
 		name
+		environments {
+			edges {
+				cursor
+				node {
+					id
+					name
+				}
+			}
+			pageInfo {
+				endCursor
+				startCursor
+				hasNextPage
+				hasPreviousPage
+			}
+		}
 		services {
 			edges {
 				cursor

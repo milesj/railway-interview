@@ -1,4 +1,5 @@
 import {
+	Anchor,
 	Button,
 	Container,
 	Flex,
@@ -11,10 +12,10 @@ import {
 	Title,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useNavigate } from "@remix-run/react";
+import { Link, json, useLoaderData, useNavigate } from "@remix-run/react";
 import { IconWhirl } from "@tabler/icons-react";
 import { useForm } from "@tanstack/react-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { valibotValidator } from "@tanstack/valibot-form-adapter";
 import type { ServiceCreateInput } from "gql/graphql";
 import type { GraphQLError } from "graphql";
@@ -25,8 +26,20 @@ import { graphqlClient } from "~/clients/graphql";
 import { FormActions } from "~/components/FormActions";
 import { FormErrors } from "~/components/FormErrors";
 import { CREATE_SERVICE } from "~/mutations";
-import { ENVIRONMENTS } from "~/utils/data";
+import { LIST_PROJECTS, READ_PROJECT } from "~/queries";
 import { getValueFieldProps } from "~/utils/form";
+
+function listProjects() {
+	return graphqlClient.request(LIST_PROJECTS);
+}
+
+function readProject(id: string) {
+	return graphqlClient.request(READ_PROJECT, { id });
+}
+
+export async function loader() {
+	return json({ projects: await listProjects() });
+}
 
 export default function ServiceCreate() {
 	const queryClient = useQueryClient();
@@ -71,20 +84,46 @@ export default function ServiceCreate() {
 	const form = useForm({
 		defaultValues: {
 			name: "",
-			environment: "production",
+			projectId: "",
+			environmentId: "",
 			type: "empty",
 			// Repository
-			repo_url: "",
-			repo_branch: "master",
+			repoUrl: "",
+			repoBranch: "master",
 			// Docker
-			docker_image: "",
+			dockerImage: "",
 		},
 		validatorAdapter: valibotValidator(),
-		async onSubmit(data) {
+		async onSubmit({ value }) {
 			setErrors([]);
 
-			console.log(data);
+			await mutate({
+				branch: value.type === "repo" ? value.repoBranch : undefined,
+				projectId: value.projectId,
+				environmentId: value.environmentId,
+				name: value.name,
+				source:
+					value.type === "repo"
+						? { repo: value.repoUrl }
+						: value.type === "docker"
+							? { image: value.dockerImage }
+							: undefined,
+			});
 		},
+	});
+
+	const initialData = useLoaderData<typeof loader>();
+	const selectedProjectId = form.useStore((state) => state.values.projectId);
+
+	const { data: projects } = useQuery({
+		queryKey: ["projects"],
+		queryFn: listProjects,
+		initialData: initialData.projects,
+	});
+	const { data: selectedProject } = useQuery({
+		queryKey: ["project", selectedProjectId],
+		queryFn: () =>
+			selectedProjectId ? readProject(selectedProjectId) : undefined,
 	});
 
 	function handleSubmit(event: FormEvent) {
@@ -100,12 +139,52 @@ export default function ServiceCreate() {
 			<form onSubmit={handleSubmit}>
 				<Stack py="md">
 					<div>
-						<form.Field name="name">
+						<form.Field
+							name="projectId"
+							validators={{
+								onChange: v.pipe(v.string(), v.nonEmpty()),
+							}}
+						>
+							{(field) => (
+								<Select
+									required
+									name={field.name}
+									label="Project"
+									description={
+										<>
+											Project to create the service within.{" "}
+											<Anchor component={Link} to="/projects/new" size="xs">
+												Create a project
+											</Anchor>
+											?
+										</>
+									}
+									placeholder="Select a project"
+									data={projects.projects.edges.map(({ node }) => ({
+										label: node.name,
+										value: node.id,
+									}))}
+									onBlur={field.handleBlur}
+									onChange={(value) => value && field.handleChange(value)}
+									{...getValueFieldProps(field.state)}
+								/>
+							)}
+						</form.Field>
+					</div>
+
+					<div>
+						<form.Field
+							name="name"
+							validators={{
+								onChange: v.pipe(v.string(), v.nonEmpty()),
+							}}
+						>
 							{(field) => (
 								<TextInput
+									required
 									name={field.name}
 									label="Name"
-									description="Name of your service. If not provided, will be automatically generated."
+									description="Name of your service."
 									onBlur={field.handleBlur}
 									onChange={(e) => field.handleChange(e.target.value)}
 									{...getValueFieldProps(field.state)}
@@ -115,19 +194,20 @@ export default function ServiceCreate() {
 					</div>
 
 					<div>
-						<form.Field
-							name="environment"
-							validators={{
-								onChange: v.picklist(ENVIRONMENTS.map((env) => env.value)),
-							}}
-						>
+						<form.Field name="environmentId">
 							{(field) => (
 								<Select
 									required
 									name={field.name}
 									label="Environment"
 									description="Environment to create the service in."
-									data={ENVIRONMENTS}
+									disabled={
+										!selectedProject ||
+										selectedProject.project.environments.edges.length === 0
+									}
+									data={selectedProject?.project.environments.edges.map(
+										({ node }) => ({ label: node.name, value: node.id }),
+									)}
 									onBlur={field.handleBlur}
 									onChange={(value) => value && field.handleChange(value)}
 									{...getValueFieldProps(field.state)}
@@ -180,12 +260,9 @@ export default function ServiceCreate() {
 								<>
 									<div>
 										<form.Field
-											name="repo_url"
+											name="repoUrl"
 											validators={{
-												onChange: v.union([
-													v.pipe(v.string(), v.url()),
-													v.pipe(v.string(), v.startsWith("git@")),
-												]),
+												onChange: v.pipe(v.string(), v.url()),
 											}}
 										>
 											{(field) => (
@@ -193,7 +270,7 @@ export default function ServiceCreate() {
 													required
 													name={field.name}
 													label="Repository"
-													description="URL of your repository. Supports both https and git protocols."
+													description="URL of your repository."
 													onBlur={field.handleBlur}
 													onChange={(e) => field.handleChange(e.target.value)}
 													{...getValueFieldProps(field.state)}
@@ -204,7 +281,7 @@ export default function ServiceCreate() {
 
 									<div>
 										<form.Field
-											name="repo_branch"
+											name="repoBranch"
 											validators={{
 												onChange: v.pipe(v.string(), v.nonEmpty()),
 											}}
@@ -214,7 +291,7 @@ export default function ServiceCreate() {
 													required
 													name={field.name}
 													label="Branch name"
-													description="Name of branch to spinup."
+													description="Name of branch to spin up."
 													onBlur={field.handleBlur}
 													onChange={(e) => field.handleChange(e.target.value)}
 													{...getValueFieldProps(field.state)}
@@ -232,7 +309,7 @@ export default function ServiceCreate() {
 							selected && (
 								<div>
 									<form.Field
-										name="docker_image"
+										name="dockerImage"
 										validators={{
 											onChange: v.pipe(v.string(), v.nonEmpty()),
 										}}
