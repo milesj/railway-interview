@@ -1,9 +1,6 @@
 import {
-	Alert,
 	Button,
 	Container,
-	Flex,
-	List,
 	Select,
 	Stack,
 	Switch,
@@ -12,32 +9,20 @@ import {
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@remix-run/react";
-import { IconInfoCircle } from "@tabler/icons-react";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { valibotValidator } from "@tanstack/valibot-form-adapter";
-import { graphql } from "gql";
 import type { ProjectCreateInput } from "gql/graphql";
 import type { GraphQLError } from "graphql";
 import { ClientError } from "graphql-request";
 import { type FormEvent, useState } from "react";
 import * as v from "valibot";
 import { graphqlClient } from "~/clients/graphql";
+import { FormActions } from "~/components/FormActions";
+import { FormErrors } from "~/components/FormErrors";
+import { CREATE_PROJECT } from "~/mutations";
 import { ENVIRONMENTS } from "~/utils/data";
 import { getCheckedFieldProps, getValueFieldProps } from "~/utils/form";
-
-function createProject(input: ProjectCreateInput) {
-	return graphqlClient.request(
-		graphql(`
-mutation CreateProject($input: ProjectCreateInput!) {
-	projectCreate(input: $input) {
-		id
-		name
-	}
-}`),
-		{ input },
-	);
-}
 
 export default function ProjectCreate() {
 	const queryClient = useQueryClient();
@@ -45,7 +30,8 @@ export default function ProjectCreate() {
 
 	const [errors, setErrors] = useState<GraphQLError[]>();
 	const { mutate, isPending } = useMutation({
-		mutationFn: createProject,
+		mutationFn: (input: ProjectCreateInput) =>
+			graphqlClient.request(CREATE_PROJECT, { input }),
 		onSuccess(data) {
 			notifications.show({
 				message: `Project ${data.projectCreate.name} has been created! Will redirect in 3 seconds.`,
@@ -181,17 +167,9 @@ export default function ProjectCreate() {
 					</div>
 				</Stack>
 
-				{errors && errors.length > 0 && (
-					<Alert color="red" mt="md" icon={<IconInfoCircle />}>
-						<List>
-							{errors.map((error) => (
-								<List.Item key={error.message}>{error.message}</List.Item>
-							))}
-						</List>
-					</Alert>
-				)}
+				<FormErrors errors={errors} />
 
-				<Flex justify="center" mt="xl">
+				<FormActions>
 					<form.Subscribe
 						selector={(state) => [state.canSubmit, state.isSubmitting]}
 					>
@@ -206,7 +184,7 @@ export default function ProjectCreate() {
 							</Button>
 						)}
 					</form.Subscribe>
-				</Flex>
+				</FormActions>
 			</form>
 		</Container>
 	);

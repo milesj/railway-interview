@@ -141,14 +141,14 @@ export default function App() {
 					<NavLink
 						component={Link}
 						to="/services"
-						label="View active"
+						label="View active services"
 						leftSection={<IconCube size="1rem" />}
 					/>
 
 					<NavLink
 						component={Link}
 						to="/services/new"
-						label="Spin up"
+						label="Spin up service"
 						leftSection={<IconCubePlus size="1rem" />}
 					/>
 				</NavLink>
