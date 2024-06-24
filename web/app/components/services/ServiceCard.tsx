@@ -1,6 +1,15 @@
-import { ActionIcon, Anchor, Card, Flex, Menu } from "@mantine/core";
+import { ActionIcon, Anchor, Card, Flex, Menu, Text } from "@mantine/core";
+import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
 import { IconDotsVertical, IconTrash } from "@tabler/icons-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { ReadProjectQuery } from "gql/graphql";
+import { graphqlClient } from "~/clients/graphql";
+import { DELETE_SERVICE } from "~/mutations";
+
+function deleteService(id: string) {
+	return graphqlClient.request(DELETE_SERVICE, { id });
+}
 
 export interface ServiceCardProps {
 	projectId: string;
@@ -8,6 +17,43 @@ export interface ServiceCardProps {
 }
 
 export function ServiceCard({ service, projectId }: ServiceCardProps) {
+	const queryClient = useQueryClient();
+
+	const { mutate } = useMutation({
+		mutationFn: deleteService,
+		onSuccess() {
+			notifications.show({
+				message: "Project has been deleted!",
+				color: "green",
+				autoClose: 3000,
+			});
+
+			// Clear projects list cache
+			queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+		},
+		onError(error) {
+			// TODO: handle error state
+			console.error(error);
+		},
+	});
+
+	function handleDelete() {
+		return modals.openConfirmModal({
+			title: "Delete service?",
+			children: (
+				<Text size="sm">
+					Are you sure you want to delete service{" "}
+					<strong>{service.name}</strong>?
+				</Text>
+			),
+			labels: { confirm: "Delete", cancel: "Cancel" },
+			confirmProps: { color: "red" },
+			onConfirm: () => {
+				mutate(service.id);
+			},
+		});
+	}
+
 	return (
 		<Card>
 			<Menu shadow="md">
@@ -28,7 +74,7 @@ export function ServiceCard({ service, projectId }: ServiceCardProps) {
 
 					<Flex flex="1">
 						<Anchor
-							href={`/project/${projectId}/service/${service.id}`}
+							href={`https://railway.app/project/${projectId}/service/${service.id}`}
 							target="_blank"
 						>
 							{service.name || service.id}
@@ -45,7 +91,11 @@ export function ServiceCard({ service, projectId }: ServiceCardProps) {
 				</Flex>
 
 				<Menu.Dropdown>
-					<Menu.Item color="red" leftSection={<IconTrash size="1rem" />}>
+					<Menu.Item
+						color="red"
+						leftSection={<IconTrash size="1rem" />}
+						onClick={handleDelete}
+					>
 						Delete service
 					</Menu.Item>
 				</Menu.Dropdown>

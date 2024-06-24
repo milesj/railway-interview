@@ -7,3 +7,4 @@
 - Date/special types in GQL schema
 - How to handle validation errors in gql responses?
 - Better SSR handling: https://tanstack.com/query/latest/docs/framework/react/guides/ssr
+- Loading/failure states

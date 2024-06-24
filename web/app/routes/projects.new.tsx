@@ -177,7 +177,7 @@ export default function ProjectCreate() {
 							<Button
 								type="submit"
 								size="lg"
-								disabled={!canSubmit}
+								disabled={!canSubmit || isPending}
 								loading={isSubmitting || isPending}
 							>
 								Create

@@ -3,18 +3,12 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { IconDotsVertical, IconTrash } from "@tabler/icons-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { graphql } from "gql";
 import type { ListProjectsQuery } from "gql/graphql";
 import { graphqlClient } from "~/clients/graphql";
+import { DELETE_PROJECT } from "~/mutations";
 
 function deleteProject(id: string) {
-	return graphqlClient.request(
-		graphql(`
-mutation DeleteProject($id: String!) {
-		projectDelete(id: $id)
-}`),
-		{ id },
-	);
+	return graphqlClient.request(DELETE_PROJECT, { id });
 }
 
 export interface ProjectRowProps {

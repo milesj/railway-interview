@@ -10,15 +10,64 @@ import {
 	TextInput,
 	Title,
 } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { useNavigate } from "@remix-run/react";
 import { IconWhirl } from "@tabler/icons-react";
 import { useForm } from "@tanstack/react-form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { valibotValidator } from "@tanstack/valibot-form-adapter";
-import type { FormEvent } from "react";
+import type { ServiceCreateInput } from "gql/graphql";
+import type { GraphQLError } from "graphql";
+import { ClientError } from "graphql-request";
+import { type FormEvent, useState } from "react";
 import * as v from "valibot";
+import { graphqlClient } from "~/clients/graphql";
+import { FormActions } from "~/components/FormActions";
+import { FormErrors } from "~/components/FormErrors";
+import { CREATE_SERVICE } from "~/mutations";
 import { ENVIRONMENTS } from "~/utils/data";
 import { getValueFieldProps } from "~/utils/form";
 
 export default function ServiceCreate() {
+	const queryClient = useQueryClient();
+	const navigate = useNavigate();
+
+	const [errors, setErrors] = useState<GraphQLError[]>();
+	const { mutate, isPending } = useMutation({
+		mutationFn: (input: ServiceCreateInput) =>
+			graphqlClient.request(CREATE_SERVICE, { input }),
+		onSuccess(data) {
+			notifications.show({
+				message: `Service ${data.serviceCreate.name} has been created! Will redirect in 3 seconds.`,
+				color: "green",
+				autoClose: 3000,
+			});
+
+			// Clear project cache
+			queryClient.invalidateQueries({
+				queryKey: ["project", data.serviceCreate.projectId],
+			});
+
+			// Then redirect to the services page
+			setTimeout(() => {
+				navigate(`/services?projectId=${data.serviceCreate.projectId}`);
+			}, 3000);
+		},
+		onError(error) {
+			if (error instanceof ClientError) {
+				if (error.response.errors) {
+					setErrors(error.response.errors);
+					return;
+				}
+			}
+
+			notifications.show({
+				message: "Failed to create service, please try again later.",
+				color: "red",
+			});
+		},
+	});
+
 	const form = useForm({
 		defaultValues: {
 			name: "",
@@ -32,6 +81,8 @@ export default function ServiceCreate() {
 		},
 		validatorAdapter: valibotValidator(),
 		async onSubmit(data) {
+			setErrors([]);
+
 			console.log(data);
 		},
 	});
@@ -204,7 +255,9 @@ export default function ServiceCreate() {
 					</form.Subscribe>
 				</Stack>
 
-				<Flex justify="center" mt="xl">
+				<FormErrors errors={errors} />
+
+				<FormActions>
 					<form.Subscribe
 						selector={(state) => [state.canSubmit, state.isSubmitting]}
 					>
@@ -213,14 +266,14 @@ export default function ServiceCreate() {
 								type="submit"
 								size="lg"
 								leftSection={<IconWhirl />}
-								disabled={!canSubmit}
-								loading={isSubmitting}
+								disabled={!canSubmit || isPending}
+								loading={isSubmitting || isPending}
 							>
 								Spin
 							</Button>
 						)}
 					</form.Subscribe>
-				</Flex>
+				</FormActions>
 			</form>
 		</Container>
 	);

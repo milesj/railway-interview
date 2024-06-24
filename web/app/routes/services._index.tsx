@@ -7,6 +7,8 @@ import {
 	Container,
 	Flex,
 	Grid,
+	Group,
+	Loader,
 	Menu,
 	Stack,
 	Text,
@@ -34,7 +36,7 @@ export default function ServiceList() {
 		searchParams.get("projectId"),
 	);
 
-	const { data } = useQuery({
+	const { data, isPending } = useQuery({
 		queryKey: ["project", selectedProjectId],
 		queryFn: () => (selectedProjectId ? readProject(selectedProjectId) : null),
 	});
@@ -76,6 +78,14 @@ export default function ServiceList() {
 							<Button component={Link} to="/services/new" size="lg">
 								Create service
 							</Button>
+
+							<Group justify="center" mt="xl">
+								<div>Or change project:</div>
+								<ProjectsSelector
+									selected={selectedProjectId}
+									onChange={handleChangeProject}
+								/>
+							</Group>
 						</NoResults>
 					) : (
 						<>
@@ -87,6 +97,12 @@ export default function ServiceList() {
 									onChange={handleChangeProject}
 								/>
 							</Flex>
+
+							{isPending && (
+								<Center>
+									<Loader />
+								</Center>
+							)}
 
 							<Grid>
 								{data?.project.services.edges.map(({ node: service }) => (

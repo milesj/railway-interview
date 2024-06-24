@@ -1,4 +1,4 @@
-import { Button, Container, Table, Title } from "@mantine/core";
+import { Button, Center, Container, Loader, Table, Title } from "@mantine/core";
 import { Link, json, useLoaderData } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import { graphqlClient } from "~/clients/graphql";
@@ -16,7 +16,7 @@ export async function loader() {
 
 export default function ProjectList() {
 	const initialData = useLoaderData<typeof loader>();
-	const { data } = useQuery({
+	const { data, isPending } = useQuery({
 		queryKey: ["projects"],
 		queryFn: listProjects,
 		initialData,
@@ -24,6 +24,12 @@ export default function ProjectList() {
 
 	return (
 		<Container>
+			{isPending && (
+				<Center>
+					<Loader />
+				</Center>
+			)}
+
 			{data.projects.edges.length === 0 && (
 				<NoResults
 					title="No projects available"
